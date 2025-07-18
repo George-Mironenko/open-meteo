@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: open_meteo_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: users
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./etl_code/sql_script/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5434:5432"
+
+  app:
+    build: .
+    container_name: open_meteo_app
+    depends_on:
+      - db
+    environment:
+      DB_USER: users
+      DB_PASSWORD: password
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: database
+    command: python main.py
+
+volumes:
+  postgres_data:
