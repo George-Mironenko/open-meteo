@@ -35,3 +35,15 @@ def knots_to_meters_per_second(knots):
         float: Скорость в метрах в секунду
     """
     return knots * 0.514444
+
+def build_api_url(start_date, end_date) -> str:
+    """
+    Функция для, создание ссылки с ограниченными датами.
+    :param start_date: Дата начала интервала
+    :param end_date: Дата конца интервала
+    :return: Готовую ссылку с интервалом времени
+    """
+    with open("API", "r") as file:
+        api_url = file.read()
+
+    return f"{api_url}start_date={start_date}&end_date={end_date}"

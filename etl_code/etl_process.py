@@ -4,19 +4,11 @@ import requests
 import pandas as pd
 
 # Импортируем функции из модуля unit_converter.py
-from unit_converter import (fahrenheit_to_celsius,
+from unit_converter import (fahrenheit_to_celsius, build_api_url,
                             inches_to_millimeters, knots_to_meters_per_second)
+# Модуль для работы с базы данных postgres.
 from data_base import PostgresConnection
 
-
-# Читаем файл с API
-with open("API", "r") as file:
-    API_URL = file.read()
-
-# Делаем HTTP-запрос
-response = requests.get(API_URL)
-# Преобразовываем данные в формат JSON
-data = response.json()
 
 
 def insert_to_db(daily_df):
@@ -59,7 +51,13 @@ def insert_to_db(daily_df):
         db.close()
 
 
-def extract_transform_load():
+def extract_transform_load(start_date, end_date):
+    # Делаем HTTP-запрос
+    api_url = build_api_url(start_date, end_date)
+    response = requests.get(api_url)
+    # Преобразовываем данные в формат JSON
+    data = response.json()
+
     # Преобразуем все необходимые поля
     hourly = data["hourly"]
     df = pd.DataFrame({
