@@ -1,9 +1,13 @@
 version: "3.9"
 
 services:
-  db:
-    image: postgres:16
-    container_name: open_meteo_postgres
+  etl:
+    build:
+      context: .
+      args:
+        START_DATE: ${START_DATE}
+        END_DATE: ${END_DATE}
+    container_name: open_meteo_etl
     restart: always
     environment:
       POSTGRES_USER: users
@@ -26,6 +30,8 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: database
+      START_DATE: "2025-05-16"
+      END_DATE: "2025-05-30"
     command: python main.py
 
 volumes:
