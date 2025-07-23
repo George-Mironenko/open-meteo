@@ -1,14 +1,11 @@
 version: "3.9"
 
 services:
-  etl:
-    build:
-      context: .
-      args:
-        START_DATE: ${START_DATE}
-        END_DATE: ${END_DATE}
-    container_name: open_meteo_etl
-    restart: always
+  db:
+    image: postgres:16
+    container_name: open_meteo_db
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_USER: users
       POSTGRES_PASSWORD: password
@@ -16,12 +13,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./etl_code/sql_script/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5434:5432"
 
-  app:
-    build: .
-    container_name: open_meteo_app
+  etl:
+    build:
+      context: .
+    container_name: open_meteo_etl
     depends_on:
       - db
     environment:
@@ -32,7 +28,7 @@ services:
       DB_NAME: database
       START_DATE: "2025-05-16"
       END_DATE: "2025-05-30"
-    command: python main.py
+    command: python etl_code/main.py
 
 volumes:
   postgres_data:
